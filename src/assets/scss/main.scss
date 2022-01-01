@@ -1,0 +1,20 @@
+@import "vue-loading-overlay/dist/vue-loading";
+
+$appGreen: #41b883;
+$appBlue: #34495e;
+
+.primary-el {
+  background-color: $appGreen !important;
+  border-color: $appBlue !important;
+}
+
+.secondary-el {
+  background-color: $appBlue !important;
+  border-color: $appGreen !important;
+}
+
+#app {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
