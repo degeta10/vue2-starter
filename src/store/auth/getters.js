@@ -17,4 +17,7 @@ export default {
   expiresAt(state) {
     return state.expiresAt;
   },
+  user(state) {
+    return state.user;
+  },
 };

@@ -4,7 +4,8 @@
       <form @submit.prevent="handleSubmit">
         <div class="card">
           <div class="card-body">
-            <h3 class="text-center my-4">Signup</h3>
+            <h3 class="text-center my-4">Profile</h3>
+
             <div class="form-group">
               <input
                 v-bind:class="{
@@ -31,30 +32,12 @@
             </div>
             <div class="form-group">
               <input
-                v-bind:class="{
-                  'is-invalid': errors.email || $v.form.email.$error,
-                  'is-valid': !errors.email && submitted,
-                }"
-                v-model="form.email"
+                v-model="email"
                 type="text"
                 placeholder="Email"
                 class="form-control"
+                disabled
               />
-              <div v-if="!$v.form.email.email" class="invalid-feedback">
-                Please enter a valid email!
-              </div>
-              <div v-if="!$v.form.email.required" class="invalid-feedback">
-                Email is required!
-              </div>
-              <ul class="errors list-unstyled" v-if="errors.email">
-                <li
-                  class="text-danger small"
-                  :key="error"
-                  v-for="error in errors.email"
-                >
-                  {{ error }}
-                </li>
-              </ul>
             </div>
             <div class="form-group">
               <input
@@ -67,12 +50,6 @@
                 placeholder="Password"
                 class="form-control"
               />
-              <div v-if="!$v.form.password.required" class="invalid-feedback">
-                Password is required!
-              </div>
-              <div v-if="!$v.form.password.minLength" class="invalid-feedback">
-                Password must have minimum 8 characters!
-              </div>
               <ul class="errors list-unstyled" v-if="errors.password">
                 <li
                   class="text-danger small"
@@ -132,7 +109,7 @@
                   class="fa-spin"
                   v-if="loading"
                 />
-                {{ loading ? "" : "Signup" }}
+                {{ loading ? "" : "Update" }}
               </button>
             </div>
           </div>
@@ -143,14 +120,19 @@
 </template>
 
 <script>
-import { required, email, sameAs, minLength } from "vuelidate/lib/validators";
+import {
+  required,
+  requiredIf,
+  minLength,
+  sameAs,
+} from "vuelidate/lib/validators";
 export default {
-  name: "Signup",
+  name: "Profile",
   data() {
     return {
+      email: "",
       form: {
         name: "",
-        email: "",
         password: "",
         password_confirmation: "",
       },
@@ -162,12 +144,26 @@ export default {
   validations: {
     form: {
       name: { required },
-      email: { required, email },
-      password: { required, minLength: minLength(8) },
-      password_confirmation: { required, sameAsPassword: sameAs("password") },
+      password: { minLength: minLength(8) },
+      password_confirmation: {
+        required: requiredIf(function (form) {
+          return form.password !== "";
+        }),
+        sameAsPassword: sameAs("password"),
+      },
     },
   },
+  mounted() {
+    this.getUserDetails();
+  },
   methods: {
+    getUserDetails() {
+      this.$axios.get("auth/me").then((response) => {
+        const { data } = response.data;
+        this.form.name = data.name;
+        this.email = data.email;
+      });
+    },
     handleSubmit() {
       this.$v.$touch();
       if (this.$v.$invalid) {
@@ -176,22 +172,29 @@ export default {
         });
         return;
       }
-      this.signUp();
+      this.updateProfile();
     },
     scrollToError() {
       let dom = document.querySelector(".is-invalid");
       let top = dom.offsetTop;
       window.scrollTo(0, top);
     },
-    signUp() {
+    updateProfile() {
       this.loading = true;
       this.$axios
-        .post("auth/signup", this.form)
+        .patch("auth/profile", this.form)
         .then((response) => {
           this.loading = false;
           this.submitted = true;
-          this.$noty.success(response.data.message);
-          this.$router.push("login");
+          this.form.password = this.form.password_confirmation = "";
+          this.$store
+            .dispatch("auth/updateUser", {
+              name: this.form.name,
+              email: this.email,
+            })
+            .then((store) => {
+              this.$noty.success(response.data.message);
+            });
         })
         .catch(({ response }) => {
           this.loading = false;

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-library.add(faSpinner);
+library.add([faSpinner, faUserCircle]);
 Vue.component("font-awesome-icon", FontAwesomeIcon);

@@ -11,6 +11,7 @@ export default {
     accessToken: authData?.access_token ? authData.access_token : "",
     refreshToken: authData?.refresh_token ? authData.refresh_token : "",
     expiresAt: authData?.expires_at ? authData.expires_at : "",
+    user: authData?.user ? authData.user : {},
   },
   mutations,
   getters,

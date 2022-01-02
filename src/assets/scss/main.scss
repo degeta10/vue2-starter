@@ -3,6 +3,11 @@
 $appGreen: #41b883;
 $appBlue: #34495e;
 
+body {
+  color: $appBlue !important;
+  background-color: #e5f2e5 !important;
+}
+
 .primary-el {
   background-color: $appGreen !important;
   border-color: $appBlue !important;
